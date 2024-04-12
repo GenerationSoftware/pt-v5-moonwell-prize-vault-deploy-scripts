@@ -1,17 +1,10 @@
 ds-test/=lib/forge-std/lib/ds-test/src/
 forge-std/=lib/forge-std/src/
 
-openzeppelin-contracts/=lib/openzeppelin-contracts/contracts/
-prb-math/=lib/pt-v5-prize-pool/lib/prb-math/src/
-pt-v5-claimer/=lib/pt-v5-claimer/src/
-pt-v5-draw-manager/=lib/pt-v5-draw-manager/src/
 pt-v5-prize-pool/=lib/pt-v5-prize-pool/src/
-pt-v5-rng-witnet/=lib/pt-v5-rng-witnet/src/
 pt-v5-tpda-liquidator/=lib/pt-v5-tpda-liquidator/src/
 pt-v5-liquidator-interfaces/=lib/pt-v5-tpda-liquidator/lib/pt-v5-liquidator-interfaces/src/interfaces/
-pt-v5-twab-controller/=lib/pt-v5-twab-controller/src/
-pt-v5-twab-rewards/=lib/pt-v5-twab-rewards/src/
+pt-v5-twab-controller/=lib/pt-v5-prize-pool/lib/pt-v5-twab-controller/src/
 pt-v5-vault/=lib/pt-v5-vault/src/
-pt-v5-staking-vault/=lib/pt-v5-staking-vault/src/
+pt-v5-yield-daddy-liquidators/=lib/pt-v5-yield-daddy-liquidators/src/
 yield-daddy/=lib/yield-daddy/src/
-solmate/=lib/yield-daddy/lib/solmate/src/
