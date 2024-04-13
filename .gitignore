@@ -7,9 +7,6 @@ out/
 !broadcast
 broadcast/*
 
-# Ignores local deployments
-deployments/localhost/*
-
 .DS_Store
 node_modules
 
@@ -22,3 +19,6 @@ node_modules
 
 # Generated Docs
 reference-out/
+
+# Temporary Config Files
+config/deploy.json

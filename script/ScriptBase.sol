@@ -5,44 +5,41 @@ import { Script } from "forge-std/Script.sol";
 import { UD2x18, ud2x18 } from "prb-math/UD2x18.sol";
 import { sd1x18 } from "prb-math/SD1x18.sol";
 import { SafeCast } from "openzeppelin/utils/math/SafeCast.sol";
+import { IPool, IRewardsController, AaveV3ERC4626, ERC20 } from "yield-daddy/aave-v3/AaveV3ERC4626.sol";
+
+import { PrizePool } from "pt-v5-prize-pool/PrizePool.sol";
+import { TpdaLiquidationPairFactory, TpdaLiquidationPair } from "pt-v5-tpda-liquidator/TpdaLiquidationPairFactory.sol";
+import { AaveV3ERC4626LiquidatorFactory, AaveV3ERC4626Liquidator, IPrizePool } from "pt-v5-yield-daddy-liquidators/AaveV3ERC4626LiquidatorFactory.sol";
+import { PrizeVaultFactory, PrizeVault, IERC4626 } from "pt-v5-vault/PrizeVaultFactory.sol";
 
 struct Configuration {
-    // Twab Controller
-    uint32 twabPeriodLength; // TWAB_PERIOD_LENGTH
+    // LP Config
+    TpdaLiquidationPairFactory lpFactory;
+    uint256 lpTargetAuctionPeriod;
+    uint192 lpTargetAuctionPrice;
+    uint256 lpSmoothingFactor;
 
-    // Prize Pool
-    uint256 tierLiquidityUtilizationRate;
-    uint32 drawPeriodSeconds;
-    uint48 firstDrawStartsIn;
-    uint24 grandPrizePeriodDraws;
-    uint8 numberOfTiers;
-    uint8 tierShares;
-    uint8 canaryShares;
-    uint8 reserveShares;
-    uint24 drawTimeout;
-    address prizeToken;
+    // Reward LP Config
+    AaveV3ERC4626LiquidatorFactory rewardLpFactory;
+    uint256 rewardLpTargetAuctionPeriod;
+    uint192 rewardLpTargetAuctionPrice;
+    uint256 rewardLpSmoothingFactor;
 
-    // Stake to Win Vault
-    address stakedAsset;
-    string stakingVaultName;
-    string stakingVaultSymbol;
-    string stakingPrizeVaultName;
-    string stakingPrizeVaultSymbol;
-    
-    // RNG
-    address rng;
-    string rngType;
-    
-    // Draw Manager config
-    uint48 drawAuctionDuration;
-    uint48 drawAuctionTargetSaleTime;
-    UD2x18 drawAuctionTargetFirstSaleFraction;
-    uint256 drawAuctionMaxReward;
-    uint256 drawAuctionMaxRetries;
+    // Yield Vault Config
+    address yieldVaultComputedAddress;
+    IPool aaveV3Pool;
+    IRewardsController aaveV3RewardsController;
+    ERC20 aaveV3Asset;
 
-    // Claimer config
-    uint256 claimerTimeToReachMaxFee;
-    UD2x18 claimerMaxFeePercent;
+    // Prize Vault Config
+    PrizePool prizePool;
+    PrizeVaultFactory prizeVaultFactory;
+    address claimer;
+    string prizeVaultName;
+    string prizeVaultSymbol;
+    address prizeVaultOwner;
+    address prizeVaultYieldFeeRecipient;
+    uint32 prizeVaultYieldFeePercentage;
 }
 
 contract ScriptBase is Script {
@@ -51,42 +48,33 @@ contract ScriptBase is Script {
     function loadConfig(string memory filepath) internal view returns (Configuration memory config) {
         string memory file = vm.readFile(filepath);
 
-        // Twab Controller
-        config.twabPeriodLength                     = 1 hours;
+        // LP Config
+        config.lpFactory                    = TpdaLiquidationPairFactory(vm.parseJsonAddress(file, "$.lpFactory"));
+        config.lpTargetAuctionPeriod        = vm.parseJsonUint(file, "$.lpTargetAuctionPeriod");
+        config.lpTargetAuctionPrice         = vm.parseJsonUint(file, "$.lpTargetAuctionPrice").toUint192();
+        config.lpSmoothingFactor            = vm.parseJsonUint(file, "$.lpSmoothingFactor");
 
-        // Prize Pool
-        config.tierLiquidityUtilizationRate         = vm.parseJsonUint(file, "$.prize_pool.tier_liquidity_utilization_rate");
-        config.drawPeriodSeconds                    = vm.parseJsonUint(file, "$.prize_pool.draw_period_seconds").toUint32();
-        config.firstDrawStartsIn                    = vm.parseJsonUint(file, "$.prize_pool.first_draw_starts_in").toUint48();
-        config.grandPrizePeriodDraws                = vm.parseJsonUint(file, "$.prize_pool.grand_prize_period_draws").toUint24();
-        config.numberOfTiers                        = vm.parseJsonUint(file, "$.prize_pool.number_of_tiers").toUint8();
-        config.tierShares                           = vm.parseJsonUint(file, "$.prize_pool.tier_shares").toUint8();
-        config.canaryShares                         = vm.parseJsonUint(file, "$.prize_pool.canary_shares").toUint8();
-        config.reserveShares                        = vm.parseJsonUint(file, "$.prize_pool.reserve_shares").toUint8();
-        config.drawTimeout                          = vm.parseJsonUint(file, "$.prize_pool.draw_timeout").toUint24();
-        config.prizeToken                           = vm.parseJsonAddress(file, "$.prize_pool.prize_token");
+        // Reward LP Config
+        config.rewardLpFactory              = AaveV3ERC4626LiquidatorFactory(vm.parseJsonAddress(file, "$.rewardLpFactory"));
+        config.rewardLpTargetAuctionPeriod  = vm.parseJsonUint(file, "$.rewardLpTargetAuctionPeriod");
+        config.rewardLpTargetAuctionPrice   = vm.parseJsonUint(file, "$.rewardLpTargetAuctionPrice").toUint192();
+        config.rewardLpSmoothingFactor      = vm.parseJsonUint(file, "$.rewardLpSmoothingFactor");
 
-        // Stake to Win Vault
-        config.stakedAsset                          = vm.parseJsonAddress(file, "$.stake_to_win.staking_vault.asset");
-        config.stakingVaultName                     = vm.parseJsonString(file, "$.stake_to_win.staking_vault.name");
-        config.stakingVaultSymbol                   = vm.parseJsonString(file, "$.stake_to_win.staking_vault.symbol");
-        config.stakingPrizeVaultName                = vm.parseJsonString(file, "$.stake_to_win.prize_vault.name");
-        config.stakingPrizeVaultSymbol              = vm.parseJsonString(file, "$.stake_to_win.prize_vault.symbol");
-        
-        // RNG
-        config.rng                                  = vm.parseJsonAddress(file, "$.rng.contract");
-        config.rngType                              = vm.parseJsonString(file, "$.rng.type");
-        
-        // Draw Manager config
-        config.drawAuctionDuration                  = vm.parseJsonUint(file, "$.draw_manager.draw_auction_duration").toUint48();
-        config.drawAuctionTargetSaleTime            = vm.parseJsonUint(file, "$.draw_manager.draw_auction_target_sale_time").toUint48();
-        config.drawAuctionTargetFirstSaleFraction   = ud2x18(vm.parseJsonUint(file, "$.draw_manager.draw_auction_target_first_sale_fraction").toUint64());
-        config.drawAuctionMaxReward                 = vm.parseJsonUint(file, "$.draw_manager.draw_auction_max_reward");
-        config.drawAuctionMaxRetries                = vm.parseJsonUint(file, "$.draw_manager.draw_auction_max_retries");
+        // Yield Vault Config
+        config.yieldVaultComputedAddress    = vm.parseJsonAddress(file, "$.yieldVaultComputedAddress");
+        config.aaveV3Pool                   = IPool(vm.parseJsonAddress(file, "$.aaveV3Pool"));
+        config.aaveV3RewardsController      = IRewardsController(vm.parseJsonAddress(file, "$.aaveV3RewardsController"));
+        config.aaveV3Asset                  = ERC20(vm.parseJsonAddress(file, "$.aaveV3Asset"));
 
-        // Claimer config
-        config.claimerTimeToReachMaxFee             = vm.parseJsonUint(file, "$.claimer.time_to_reach_max_fee");
-        config.claimerMaxFeePercent                 = ud2x18(vm.parseJsonUint(file, "$.claimer.max_fee_percent").toUint64());
+        // Prize Vault
+        config.prizePool                    = PrizePool(vm.parseJsonAddress(file, "$.prizePool"));
+        config.prizeVaultFactory            = PrizeVaultFactory(vm.parseJsonAddress(file, "$.prizeVaultFactory"));
+        config.claimer                      = vm.parseJsonAddress(file, "$.claimer");
+        config.prizeVaultName               = vm.parseJsonString(file, "$.prizeVaultName");
+        config.prizeVaultSymbol             = vm.parseJsonString(file, "$.prizeVaultSymbol");
+        config.prizeVaultOwner              = vm.parseJsonAddress(file, "$.prizeVaultOwner");
+        config.prizeVaultYieldFeeRecipient  = vm.parseJsonAddress(file, "$.prizeVaultYieldFeeRecipient");
+        config.prizeVaultYieldFeePercentage = vm.parseJsonUint(file, "$.prizeVaultYieldFeePercentage").toUint32();
     }
 
 }
