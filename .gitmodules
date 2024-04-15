@@ -17,3 +17,6 @@
 [submodule "lib/pt-v5-yield-daddy-liquidators"]
 	path = lib/pt-v5-yield-daddy-liquidators
 	url = https://github.com/GenerationSoftware/pt-v5-yield-daddy-liquidators
+[submodule "lib/pt-v5-twab-delegator"]
+	path = lib/pt-v5-twab-delegator
+	url = https://github.com/GenerationSoftware/pt-v5-twab-delegator

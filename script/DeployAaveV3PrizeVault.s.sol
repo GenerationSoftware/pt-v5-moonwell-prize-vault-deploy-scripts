@@ -17,6 +17,8 @@ import {
     IRewardsController
 } from "./ScriptBase.sol";
 
+import { TwabDelegator, IERC20 } from "pt-v5-twab-delegator/TwabDelegator.sol";
+
 struct PrizeVaultAddressBook {
     PrizeVault prizeVault;
     AaveV3ERC4626 yieldVault;
@@ -131,6 +133,14 @@ contract DeployPrizeVault is ScriptBase {
             prizeVault.transferOwnership(config.prizeVaultOwner);
             console2.log("!!! Prize vault ownership offered! Accept ownership with the prize vault owner address to complete the transfer. !!!");
         }
+
+        // Deploy Twab Delegator for the prize vault
+        new TwabDelegator(
+            string.concat("Staked ", prizeVault.name()),
+            string.concat("st", prizeVault.symbol()),
+            prizeVault.twabController(),
+            IERC20(address(prizeVault))
+        );
 
         vm.stopBroadcast();
 
