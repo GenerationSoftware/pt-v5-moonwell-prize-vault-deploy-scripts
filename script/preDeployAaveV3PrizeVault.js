@@ -24,7 +24,7 @@ const main = async () => {
     console.log("                                                          |_|            |___/           ");
     console.log("");
     console.log("-----------------------------------------------------------------------------------------");
-    console.log("| Author: g9 Software Inc.                                                              |");
+    console.log("| Author: G9 Software Inc.                                                              |");
     console.log("| License: MIT                                                                          |");
     console.log("-----------------------------------------------------------------------------------------\n");
 
@@ -53,7 +53,7 @@ const main = async () => {
 
     // Symbol
     while (!params.prizeVaultSymbol) {
-        params.prizeVaultSymbol = await ask("Enter the symbol of the new prize vault (ex. pUSDC): ");
+        params.prizeVaultSymbol = await ask("Enter the symbol of the new prize vault (ex. przUSDC): ");
     }
     console.log("");
 
