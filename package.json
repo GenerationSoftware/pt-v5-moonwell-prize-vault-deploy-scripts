@@ -3,7 +3,7 @@
     "clean": "forge clean",
     "compile": "forge compile",
     "----------DEPLOYMENT-SCRIPTS----------": "",
-    "script:prizeVault": "forge script -vvv script/DeployAaveV3PrizeVault.s.sol:DeployPrizeVault --rpc-url $SCRIPT_RPC_URL --private-key $SCRIPT_PRIVATE_KEY --sender $SCRIPT_SENDER --broadcast $SCRIPT_VERIFY $SCRIPT_ETHERSCAN --priority-gas-price $SCRIPT_PRIORITY_GAS_PRICE",
+    "script:prizeVault": "forge script -vvv script/DeployAaveV3PrizeVault.s.sol:DeployPrizeVault --rpc-url $SCRIPT_RPC_URL --private-key $SCRIPT_PRIVATE_KEY --sender $SCRIPT_SENDER --broadcast $SCRIPT_VERIFY $SCRIPT_ETHERSCAN --priority-gas-price $SCRIPT_PRIORITY_GAS_PRICE && forge test -vvv --mc PrizeVaultPostDeploy",
     "script:rewardLpFactory": "forge script -vvv script/DeployAaveV3RewardLiquidatorFactory.s.sol:DeployRewardLiquidatorFactory --rpc-url $SCRIPT_RPC_URL --private-key $SCRIPT_PRIVATE_KEY --sender $SCRIPT_SENDER --broadcast $SCRIPT_VERIFY $SCRIPT_ETHERSCAN --priority-gas-price $SCRIPT_PRIORITY_GAS_PRICE",
     "----------AAVE-PRIZE-VAULT-COMMANDS----------": "",
     "deploy:localhost:prizeVault": "CONFIG=config/localhost.json SCRIPT_RPC_URL=http://localhost:8545 SCRIPT_SENDER=$LOCAL_SENDER node script/preDeployAaveV3PrizeVault.js && CONFIG=config/localhost.json SCRIPT_RPC_URL=http://localhost:8545 SCRIPT_SENDER=$LOCAL_SENDER SCRIPT_PRIVATE_KEY=$LOCAL_PRIVATE_KEY SCRIPT_PRIORITY_GAS_PRICE=100000 yarn script:prizeVault",

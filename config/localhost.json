@@ -4,13 +4,13 @@
   "lpTargetAuctionPrice": "100000000000000",
   "lpSmoothingFactor": "0",
 
-  "rewardLpFactory": "0x427EE58a6c574032085AEB90Dd05dEea6F054930",
+  "rewardLpFactory": "0x5aA185fbEFc205072FaecC6B9D564383e761f8C2",
   "rewardLpTargetAuctionPeriod": "7200",
   "rewardLpTargetAuctionPrice": "100000000000000",
   "rewardLpSmoothingFactor": "950000000000000000",
 
   "aaveV3Pool": "0xb50201558B00496A145fE76f7424749556E326D8",
-  "aaveV3RewardsController": "0x0000000000000000000000000000000000000000",
+  "aaveV3RewardsController": "0x0000000000000000000000000000000000000001",
 
   "prizePool": "0x9f594BA8A838D41E7781BFA2aeA42702E216AF5a",
   "prizeVaultFactory": "0x0393FA04637989c32b23F002A963bf934329571a",

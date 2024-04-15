@@ -13,10 +13,19 @@ import {
     AaveV3ERC4626,
     AaveV3ERC4626Liquidator,
     TpdaLiquidationPair,
-    IERC4626
+    IERC4626,
+    IRewardsController
 } from "./ScriptBase.sol";
 
+struct PrizeVaultAddressBook {
+    PrizeVault prizeVault;
+    AaveV3ERC4626 yieldVault;
+    AaveV3ERC4626Liquidator rewardLiquidator;
+    ERC20 aToken;
+}
+
 string constant configPath = "config/deploy.json";
+string constant addressBookPath = "config/addressBook.txt";
 
 contract DeployPrizeVault is ScriptBase {
 
@@ -124,6 +133,21 @@ contract DeployPrizeVault is ScriptBase {
         }
 
         vm.stopBroadcast();
+
+        // dump some addresses for the fork tests to use
+        vm.writeFile(
+            addressBookPath,
+            vm.toString(
+                abi.encode(
+                    PrizeVaultAddressBook({
+                        prizeVault: prizeVault,
+                        yieldVault: yieldVault,
+                        rewardLiquidator: rewardLiquidator,
+                        aToken: ERC20(aTokenAddress)
+                    })
+                )
+            )
+        );
     }
 
     function preDeployChecks() internal virtual {
