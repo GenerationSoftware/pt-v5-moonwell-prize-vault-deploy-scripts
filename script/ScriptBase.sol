@@ -15,15 +15,15 @@ import { PrizeVaultFactory, PrizeVault, IERC4626 } from "pt-v5-vault/PrizeVaultF
 struct Configuration {
     // LP Config
     TpdaLiquidationPairFactory lpFactory;
-    uint256 lpTargetAuctionPeriod;
-    uint192 lpTargetAuctionPrice;
-    uint256 lpSmoothingFactor;
+    uint256 prizeVaultLpTargetAuctionPeriod;
+    uint192 prizeVaultLpTargetAuctionPrice;
+    uint256 prizeVaultLpSmoothingFactor;
 
     // Reward LP Config
-    AaveV3ERC4626LiquidatorFactory rewardLpFactory;
-    uint256 rewardLpTargetAuctionPeriod;
-    uint192 rewardLpTargetAuctionPrice;
-    uint256 rewardLpSmoothingFactor;
+    AaveV3ERC4626LiquidatorFactory aaveRewardLiquidatorFactory;
+    uint256 aaveRewardLpTargetAuctionPeriod;
+    uint192 aaveRewardLpTargetAuctionPrice;
+    uint256 aaveRewardLpSmoothingFactor;
 
     // Yield Vault Config
     address yieldVaultComputedAddress;
@@ -50,15 +50,15 @@ contract ScriptBase is Script {
 
         // LP Config
         config.lpFactory                    = TpdaLiquidationPairFactory(vm.parseJsonAddress(file, "$.lpFactory"));
-        config.lpTargetAuctionPeriod        = vm.parseJsonUint(file, "$.lpTargetAuctionPeriod");
-        config.lpTargetAuctionPrice         = vm.parseJsonUint(file, "$.lpTargetAuctionPrice").toUint192();
-        config.lpSmoothingFactor            = vm.parseJsonUint(file, "$.lpSmoothingFactor");
+        config.prizeVaultLpTargetAuctionPeriod        = vm.parseJsonUint(file, "$.prizeVaultLpTargetAuctionPeriod");
+        config.prizeVaultLpTargetAuctionPrice         = vm.parseJsonUint(file, "$.prizeVaultLpTargetAuctionPrice").toUint192();
+        config.prizeVaultLpSmoothingFactor            = vm.parseJsonUint(file, "$.prizeVaultLpSmoothingFactor");
 
         // Reward LP Config
-        config.rewardLpFactory              = AaveV3ERC4626LiquidatorFactory(vm.parseJsonAddress(file, "$.rewardLpFactory"));
-        config.rewardLpTargetAuctionPeriod  = vm.parseJsonUint(file, "$.rewardLpTargetAuctionPeriod");
-        config.rewardLpTargetAuctionPrice   = vm.parseJsonUint(file, "$.rewardLpTargetAuctionPrice").toUint192();
-        config.rewardLpSmoothingFactor      = vm.parseJsonUint(file, "$.rewardLpSmoothingFactor");
+        config.aaveRewardLiquidatorFactory              = AaveV3ERC4626LiquidatorFactory(vm.parseJsonAddress(file, "$.aaveRewardLiquidatorFactory"));
+        config.aaveRewardLpTargetAuctionPeriod  = vm.parseJsonUint(file, "$.aaveRewardLpTargetAuctionPeriod");
+        config.aaveRewardLpTargetAuctionPrice   = vm.parseJsonUint(file, "$.aaveRewardLpTargetAuctionPrice").toUint192();
+        config.aaveRewardLpSmoothingFactor      = vm.parseJsonUint(file, "$.aaveRewardLpSmoothingFactor");
 
         // Yield Vault Config
         config.yieldVaultComputedAddress    = vm.parseJsonAddress(file, "$.yieldVaultComputedAddress");

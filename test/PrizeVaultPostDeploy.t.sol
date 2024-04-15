@@ -76,7 +76,7 @@ contract PrizeVaultPostDeployTest is Test {
         assertGt(addressBook.prizeVault.liquidatableBalanceOf(address(addressBook.prizeVault)), 0);
     }
 
-    function testRewardLp() public {
+    function testAaveRewardLp() public {
         // spoof `asset` rewards to the yield vault and test that the LP picks them up
         ERC20 asset = ERC20(addressBook.prizeVault.asset());
         uint256 amount = 10 ** asset.decimals();
@@ -90,7 +90,7 @@ contract PrizeVaultPostDeployTest is Test {
         vm.stopPrank();
 
         // Create new reward LP
-        TpdaLiquidationPair rewardLp = addressBook.rewardLiquidator.initializeRewardToken(address(asset));
+        TpdaLiquidationPair aaveRewardLp = addressBook.rewardLiquidator.initializeRewardToken(address(asset));
 
         // Check if rewards are picked up
         address[] memory rewardsList = new address[](1);
@@ -106,11 +106,11 @@ contract PrizeVaultPostDeployTest is Test {
         assertEq(liquid, amount);
 
         // Check if LP can liquidate
-        vm.warp(block.timestamp + rewardLp.targetAuctionPeriod());
-        uint256 maxAmountOut = rewardLp.maxAmountOut();
+        vm.warp(block.timestamp + aaveRewardLp.targetAuctionPeriod());
+        uint256 maxAmountOut = aaveRewardLp.maxAmountOut();
         assertGt(maxAmountOut, 0);
         assertLe(maxAmountOut, amount);
-        assertApproxEqAbs(rewardLp.computeExactAmountIn(maxAmountOut), uint256(rewardLp.lastAuctionPrice()), 1);
+        assertApproxEqAbs(aaveRewardLp.computeExactAmountIn(maxAmountOut), uint256(aaveRewardLp.lastAuctionPrice()), 1);
     }
 
 }

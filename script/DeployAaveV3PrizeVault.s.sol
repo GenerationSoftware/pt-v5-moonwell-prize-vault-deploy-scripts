@@ -74,14 +74,14 @@ contract DeployPrizeVault is ScriptBase {
         vm.startBroadcast();
 
         // Deploy reward liquidator
-        AaveV3ERC4626Liquidator rewardLiquidator = config.rewardLpFactory.createLiquidator(
+        AaveV3ERC4626Liquidator rewardLiquidator = config.aaveRewardLiquidatorFactory.createLiquidator(
             msg.sender,
             prizeVaultComputedAddress,
             IPrizePool(address(config.prizePool)),
             config.lpFactory,
-            config.rewardLpTargetAuctionPeriod,
-            config.rewardLpTargetAuctionPrice,
-            config.rewardLpSmoothingFactor
+            config.aaveRewardLpTargetAuctionPeriod,
+            config.aaveRewardLpTargetAuctionPrice,
+            config.aaveRewardLpSmoothingFactor
         );
 
         // Deploy Aave yield vault
@@ -120,9 +120,9 @@ contract DeployPrizeVault is ScriptBase {
             prizeVault,
             address(config.prizePool.prizeToken()),
             address(prizeVault),
-            config.lpTargetAuctionPeriod,
-            config.lpTargetAuctionPrice,
-            config.lpSmoothingFactor
+            config.prizeVaultLpTargetAuctionPeriod,
+            config.prizeVaultLpTargetAuctionPrice,
+            config.prizeVaultLpSmoothingFactor
         );
 
         // Initialize prize vault

@@ -1,13 +1,13 @@
 {
     "lpFactory": "",
-    "lpTargetAuctionPeriod": "",
-    "lpTargetAuctionPrice": "",
-    "lpSmoothingFactor": "",
+    "prizeVaultLpTargetAuctionPeriod": "",
+    "prizeVaultLpTargetAuctionPrice": "",
+    "prizeVaultLpSmoothingFactor": "",
 
-    "rewardLpFactory": "",
-    "rewardLpTargetAuctionPeriod": "",
-    "rewardLpTargetAuctionPrice": "",
-    "rewardLpSmoothingFactor": "",
+    "aaveRewardLiquidatorFactory": "",
+    "aaveRewardLpTargetAuctionPeriod": "",
+    "aaveRewardLpTargetAuctionPrice": "",
+    "aaveRewardLpSmoothingFactor": "",
 
     "aaveV3Pool": "0x794a61358D6845594F94dc1DB02A252b5b4814aD",
     "aaveV3RewardsController": "0x929EC64c34a17401F460460D4B9390518E5B473e",
