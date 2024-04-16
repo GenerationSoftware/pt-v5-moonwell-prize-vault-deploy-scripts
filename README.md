@@ -181,6 +181,7 @@ To deploy a new prize vault, first ensure the following steps have been complete
 2. configure the chain-specific deployment parameters in a JSON file
 3. deploy a new reward liquidator factory (if one does not exist on the target chain)
     1. Copy the `deploy:optimism:aaveRewardLiquidatorFactory` NPM script and modify it for your target chain before running the new script. Then set the reward liquidation factory param in the corresponding config JSON file.
+4. Transfer at least 1e5 assets to the deployer address so they can be donated to the prize vault to fill the yield buffer on deployment. (Exactly 1e5 assets will be donated on deployment. These funds are not recoverable.)
 
 ### Deploy a New Prize Vault
 
