@@ -116,8 +116,16 @@ const main = async () => {
     params.yieldVaultComputedAddress = "0x" + (await cast(`compute-address ${process.env.SCRIPT_SENDER} --nonce ${nonce + 1} `)).trim().split("0x")[1]; // add 1 to nonce since 1 tx will be sent before deployment
     console.log(`Yield vault address will be: ${params.yieldVaultComputedAddress}\n`);
 
+    // Warn about the yield buffer donation:
+    await ask(
+        "[WARNING] To deploy a prize vault, a small donation of assets must be made on deployment to fill the yield buffer (1e5 assets). " +
+        "For example, if you are deploying a prize vault with USDC, the donation would be worth 1e5 USDC ($0.10). " +
+        "These funds must be held by the signing address at the time of deployment and cannot be recovered. " + 
+        "Press enter to acknowledge and continue: "
+    );
+
     // Write params to temp config:
-    console.log("Deploying with the following params: ");
+    console.log("\nDeploying with the following params: ");
     console.log(params);
     await fs.writeFile("config/deploy.json", JSON.stringify({...params, prizeVaultComputedAddress: "placeholder"}, null, "    "));
 
