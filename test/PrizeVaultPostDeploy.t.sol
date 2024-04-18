@@ -4,7 +4,11 @@ pragma solidity ^0.8.24;
 import { console2 } from "forge-std/console2.sol";
 
 import { Test } from "forge-std/Test.sol";
-import { PrizeVaultAddressBook, ERC20, TpdaLiquidationPair, IRewardsController } from "../script/DeployAaveV3PrizeVault.s.sol";
+import { PrizeVaultAddressBook, ERC20, TpdaLiquidationPair, IRewardsController, PrizePool } from "../script/DeployAaveV3PrizeVault.s.sol";
+
+interface Rewards {
+    function getRewardsByAsset(address asset) external view returns (address[] memory);
+}
 
 /// @notice Runs some basic fork tests against a deployment
 contract PrizeVaultPostDeployTest is Test {
@@ -111,6 +115,52 @@ contract PrizeVaultPostDeployTest is Test {
         assertGt(maxAmountOut, 0);
         assertLe(maxAmountOut, amount);
         assertApproxEqAbs(aaveRewardLp.computeExactAmountIn(maxAmountOut), uint256(aaveRewardLp.lastAuctionPrice()), 1);
+    }
+
+    function testOptimismUSDCRewards() public {
+        // deposit and let rewards accrue
+        address asset = addressBook.prizeVault.asset();
+        uint256 depositAmount = 10000 * 10 ^ ERC20(asset).decimals();
+        deal(asset, address(this), depositAmount);
+        ERC20(asset).approve(address(addressBook.prizeVault), depositAmount);
+        addressBook.prizeVault.deposit(depositAmount, address(this));
+
+        vm.warp(block.timestamp + 7 days);
+
+        // get the current rewards
+        address[] memory rewardTokens = Rewards(address(addressBook.yieldVault.rewardsController())).getRewardsByAsset(address(addressBook.aToken));
+
+        // set up lp pairs for each reward
+        for (uint i = 0; i < rewardTokens.length; i++) {
+            TpdaLiquidationPair aaveRewardLp = addressBook.rewardLiquidator.initializeRewardToken(address(rewardTokens[i]));
+
+            uint256 liquid = addressBook.rewardLiquidator.liquidatableBalanceOf(rewardTokens[i]);
+            assertEq(liquid, ERC20(rewardTokens[i]).balanceOf(address(addressBook.rewardLiquidator)));
+
+            // Check if LP can liquidate
+            vm.warp(block.timestamp + aaveRewardLp.targetAuctionPeriod());
+            uint256 maxAmountOut = aaveRewardLp.maxAmountOut();
+            assertGt(maxAmountOut, 0);
+            uint256 exactAmountIn = aaveRewardLp.computeExactAmountIn(maxAmountOut);
+            assertApproxEqAbs(exactAmountIn, uint256(aaveRewardLp.lastAuctionPrice()), 1);
+
+            // liquidate
+            PrizePool prizePool = addressBook.prizeVault.prizePool();
+            ERC20 prizeToken = ERC20(address(prizePool.prizeToken()));
+            deal(address(prizeToken), address(this), exactAmountIn);
+            prizeToken.approve(address(addressBook.lpRouter), exactAmountIn);
+            uint256 amountIn = addressBook.lpRouter.swapExactAmountOut(
+                aaveRewardLp,
+                address(this),
+                maxAmountOut,
+                exactAmountIn,
+                block.timestamp
+            );
+            assertEq(amountIn, exactAmountIn);
+            assertEq(ERC20(rewardTokens[i]).balanceOf(address(this)), maxAmountOut);
+            uint24 openDrawId = prizePool.getOpenDrawId();
+            assertEq(prizePool.getContributedBetween(address(addressBook.prizeVault), openDrawId, openDrawId), exactAmountIn);
+        }
     }
 
 }

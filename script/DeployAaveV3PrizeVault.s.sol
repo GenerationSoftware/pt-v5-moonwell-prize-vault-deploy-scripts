@@ -10,9 +10,11 @@ import {
     ERC20,
     IPool,
     IPrizePool,
+    PrizePool,
     AaveV3ERC4626,
     AaveV3ERC4626Liquidator,
     TpdaLiquidationPair,
+    TpdaLiquidationRouter,
     IERC4626,
     IRewardsController
 } from "./ScriptBase.sol";
@@ -24,6 +26,7 @@ struct PrizeVaultAddressBook {
     AaveV3ERC4626 yieldVault;
     AaveV3ERC4626Liquidator rewardLiquidator;
     ERC20 aToken;
+    TpdaLiquidationRouter lpRouter;
 }
 
 string constant configPath = "config/deploy.json";
@@ -153,7 +156,8 @@ contract DeployPrizeVault is ScriptBase {
                         prizeVault: prizeVault,
                         yieldVault: yieldVault,
                         rewardLiquidator: rewardLiquidator,
-                        aToken: ERC20(aTokenAddress)
+                        aToken: ERC20(aTokenAddress),
+                        lpRouter: config.lpRouter
                     })
                 )
             )

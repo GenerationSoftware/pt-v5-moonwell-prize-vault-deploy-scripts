@@ -9,6 +9,7 @@ import { IPool, IRewardsController, AaveV3ERC4626, ERC20 } from "yield-daddy/aav
 
 import { PrizePool } from "pt-v5-prize-pool/PrizePool.sol";
 import { TpdaLiquidationPairFactory, TpdaLiquidationPair } from "pt-v5-tpda-liquidator/TpdaLiquidationPairFactory.sol";
+import { TpdaLiquidationRouter } from "pt-v5-tpda-liquidator/TpdaLiquidationRouter.sol";
 import { AaveV3ERC4626LiquidatorFactory, AaveV3ERC4626Liquidator, IPrizePool } from "pt-v5-yield-daddy-liquidators/AaveV3ERC4626LiquidatorFactory.sol";
 import { PrizeVaultFactory, PrizeVault, IERC4626 } from "pt-v5-vault/PrizeVaultFactory.sol";
 
@@ -40,6 +41,9 @@ struct Configuration {
     address prizeVaultOwner;
     address prizeVaultYieldFeeRecipient;
     uint32 prizeVaultYieldFeePercentage;
+
+    // LP Router
+    TpdaLiquidationRouter lpRouter;
 }
 
 contract ScriptBase is Script {
@@ -75,6 +79,9 @@ contract ScriptBase is Script {
         config.prizeVaultOwner              = vm.parseJsonAddress(file, "$.prizeVaultOwner");
         config.prizeVaultYieldFeeRecipient  = vm.parseJsonAddress(file, "$.prizeVaultYieldFeeRecipient");
         config.prizeVaultYieldFeePercentage = vm.parseJsonUint(file, "$.prizeVaultYieldFeePercentage").toUint32();
+
+        // LP Router
+        config.lpRouter                     = TpdaLiquidationRouter(vm.parseJsonAddress(file, "$.lpRouter"));
     }
 
 }
