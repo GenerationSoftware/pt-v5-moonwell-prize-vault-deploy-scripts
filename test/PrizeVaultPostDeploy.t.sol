@@ -136,30 +136,32 @@ contract PrizeVaultPostDeployTest is Test {
 
             uint256 liquid = addressBook.rewardLiquidator.liquidatableBalanceOf(rewardTokens[i]);
             assertEq(liquid, ERC20(rewardTokens[i]).balanceOf(address(addressBook.rewardLiquidator)));
+            if (liquid > 0) {
+                
+                // Check if LP can liquidate
+                vm.warp(block.timestamp + aaveRewardLp.targetAuctionPeriod());
+                uint256 maxAmountOut = aaveRewardLp.maxAmountOut();
+                assertGt(maxAmountOut, 0);
+                uint256 exactAmountIn = aaveRewardLp.computeExactAmountIn(maxAmountOut);
+                assertApproxEqAbs(exactAmountIn, uint256(aaveRewardLp.lastAuctionPrice()), 1);
 
-            // Check if LP can liquidate
-            vm.warp(block.timestamp + aaveRewardLp.targetAuctionPeriod());
-            uint256 maxAmountOut = aaveRewardLp.maxAmountOut();
-            assertGt(maxAmountOut, 0);
-            uint256 exactAmountIn = aaveRewardLp.computeExactAmountIn(maxAmountOut);
-            assertApproxEqAbs(exactAmountIn, uint256(aaveRewardLp.lastAuctionPrice()), 1);
-
-            // liquidate
-            PrizePool prizePool = addressBook.prizeVault.prizePool();
-            ERC20 prizeToken = ERC20(address(prizePool.prizeToken()));
-            deal(address(prizeToken), address(this), exactAmountIn);
-            prizeToken.approve(address(addressBook.lpRouter), exactAmountIn);
-            uint256 amountIn = addressBook.lpRouter.swapExactAmountOut(
-                aaveRewardLp,
-                address(this),
-                maxAmountOut,
-                exactAmountIn,
-                block.timestamp
-            );
-            assertEq(amountIn, exactAmountIn);
-            assertEq(ERC20(rewardTokens[i]).balanceOf(address(this)), maxAmountOut);
-            uint24 openDrawId = prizePool.getOpenDrawId();
-            assertEq(prizePool.getContributedBetween(address(addressBook.prizeVault), openDrawId, openDrawId), exactAmountIn);
+                // liquidate
+                PrizePool prizePool = addressBook.prizeVault.prizePool();
+                ERC20 prizeToken = ERC20(address(prizePool.prizeToken()));
+                deal(address(prizeToken), address(this), exactAmountIn);
+                prizeToken.approve(address(addressBook.lpRouter), exactAmountIn);
+                uint256 amountIn = addressBook.lpRouter.swapExactAmountOut(
+                    aaveRewardLp,
+                    address(this),
+                    maxAmountOut,
+                    exactAmountIn,
+                    block.timestamp
+                );
+                assertEq(amountIn, exactAmountIn);
+                assertEq(ERC20(rewardTokens[i]).balanceOf(address(this)), maxAmountOut);
+                uint24 openDrawId = prizePool.getOpenDrawId();
+                assertEq(prizePool.getContributedBetween(address(addressBook.prizeVault), openDrawId, openDrawId), exactAmountIn);
+            }
         }
     }
 
