@@ -125,7 +125,8 @@ contract PrizeVaultPostDeployTest is Test {
 
         vm.warp(block.timestamp + 7 days);
 
-        TpdaLiquidationPair rewardLp = addressBook.rewardLiquidator.initializeRewardToken(address(WELL));
+        TpdaLiquidationPair rewardLp = addressBook.rewardLiquidator.liquidationPairs(address(WELL));
+        require(address(rewardLp) != address(0), "not initialized");
 
         uint256 liquid = addressBook.rewardLiquidator.liquidatableBalanceOf(WELL);
         assertEq(liquid, ERC20(WELL).balanceOf(address(addressBook.rewardLiquidator)));

@@ -35,6 +35,9 @@ struct PrizeVaultAddressBook {
 string constant configPath = "config/deploy.json";
 string constant addressBookPath = "config/addressBook.txt";
 
+address constant wellAddress = address(0xA88594D404727625A9437C3f886C7643872296AE);
+address constant usdcAddress = address(0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913);
+
 contract DeployPrizeVault is ScriptBase {
 
     Configuration internal config;
@@ -165,6 +168,12 @@ contract DeployPrizeVault is ScriptBase {
             prizeVault.twabController(),
             IERC20(address(prizeVault))
         );
+
+        // Initialize active rewards
+        rewardLiquidator.initializeRewardToken(wellAddress);
+        if (address(config.moonwellVaultAsset) == usdcAddress) {
+            rewardLiquidator.initializeRewardToken(usdcAddress);
+        }
 
         vm.stopBroadcast();
 
