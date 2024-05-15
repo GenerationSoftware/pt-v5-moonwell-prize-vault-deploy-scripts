@@ -1,0 +1,18 @@
+{
+    "lpFactory": "",
+    "prizeVaultLpTargetAuctionPeriod": "21600",
+    "prizeVaultLpTargetAuctionPrice": "100000000000000",
+    "prizeVaultLpSmoothingFactor": "500000000000000000",
+
+    "rewardLiquidatorFactory": "",
+    "rewardLpTargetAuctionPeriod": "21600",
+    "rewardLpTargetAuctionPrice": "100000000000000",
+    "rewardLpSmoothingFactor": "500000000000000000",
+
+    "moonwellComptroller": "",
+
+    "prizePool": "",
+    "prizeVaultFactory": "",
+    "claimer": "",
+    "lpRouter": ""
+}

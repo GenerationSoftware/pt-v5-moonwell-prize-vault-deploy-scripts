@@ -35,10 +35,10 @@ const main = async () => {
 
     // Ask for missing param inputs:
     // Asset
-    while (!params.aaveV3Asset) {
-        const input = await ask("Enter the address of the Aave asset (the erc20 token being deposited): ");
+    while (!params.moonwellVaultAsset) {
+        const input = await ask("Enter the address of the Moonwell asset (the erc20 token being deposited): ");
         if (isAddress(input)) {
-            params.aaveV3Asset = input;
+            params.moonwellVaultAsset = input;
         } else {
             console.warn("Invalid address...");
         }
@@ -130,7 +130,7 @@ const main = async () => {
     await fs.writeFile("config/deploy.json", JSON.stringify({...params, prizeVaultComputedAddress: "placeholder"}, null, "    "));
 
     // Double check that they want to deploy:
-    const deployResponse = await ask("Would you like to deploy an Aave V3 prize vault with these params? (y/n) ");
+    const deployResponse = await ask("Would you like to deploy an Moonwell prize vault with these params? (y/n) ");
     rl.close();
     if (deployResponse.toLowerCase().charAt(0) != 'y') {
         console.log("Deployment aborted.");

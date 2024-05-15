@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.24;
+pragma solidity ^0.8.24;
 
 import "forge-std/console2.sol";
 
@@ -8,24 +8,27 @@ import {
     Configuration,
     PrizeVault,
     ERC20,
-    IPool,
     IPrizePool,
     PrizePool,
-    AaveV3ERC4626,
-    AaveV3ERC4626Liquidator,
+    CompoundERC4626,
+    RewardLiquidator,
+    IRewardSource,
     TpdaLiquidationPair,
     TpdaLiquidationRouter,
     IERC4626,
-    IRewardsController
+    IComptroller,
+    MErc20
 } from "./ScriptBase.sol";
+
+import { MToken } from "moonwell-contracts-v2/MToken.sol";
 
 import { TwabDelegator, IERC20 } from "pt-v5-twab-delegator/TwabDelegator.sol";
 
 struct PrizeVaultAddressBook {
     PrizeVault prizeVault;
-    AaveV3ERC4626 yieldVault;
-    AaveV3ERC4626Liquidator rewardLiquidator;
-    ERC20 aToken;
+    CompoundERC4626 yieldVault;
+    RewardLiquidator rewardLiquidator;
+    ERC20 mToken;
     TpdaLiquidationRouter lpRouter;
 }
 
@@ -35,14 +38,22 @@ string constant addressBookPath = "config/addressBook.txt";
 contract DeployPrizeVault is ScriptBase {
 
     Configuration internal config;
-    address internal aTokenAddress;
+    address internal mTokenAddress;
     address internal prizeVaultComputedAddress;
+    uint256 yieldBuffer;
 
     constructor() {
         config = loadConfig(configPath);
     }
 
     function run() public virtual {
+
+        // determine a safe yield buffer (moonwell has precision loss on assets with more than 9 decimals)
+        uint8 decimals = config.moonwellVaultAsset.decimals();
+        yieldBuffer = 1e5;
+        if (decimals > 9) {
+            yieldBuffer = yieldBuffer * (10 ** (decimals - 9)); // multiply by additional precision loss
+        }
 
         // Pre-deploy checks
         preDeployChecks();
@@ -52,8 +63,8 @@ contract DeployPrizeVault is ScriptBase {
             uint256 snapshot = vm.snapshot();
             
             vm.startPrank(msg.sender);
-            config.aaveV3Asset.approve(address(config.prizeVaultFactory), config.prizeVaultFactory.YIELD_BUFFER());
-            vm.mockCall(config.yieldVaultComputedAddress, abi.encodeWithSignature("asset()"), abi.encode(address(config.aaveV3Asset)));
+            config.moonwellVaultAsset.approve(address(config.prizeVaultFactory), yieldBuffer);
+            vm.mockCall(config.yieldVaultComputedAddress, abi.encodeWithSignature("asset()"), abi.encode(address(config.moonwellVaultAsset)));
             vm.mockCall(config.yieldVaultComputedAddress, abi.encodeWithSignature("decimals()"), abi.encode(18));
             prizeVaultComputedAddress = address(config.prizeVaultFactory.deployVault(
                 config.prizeVaultName,
@@ -63,6 +74,7 @@ contract DeployPrizeVault is ScriptBase {
                 config.claimer,
                 config.prizeVaultYieldFeeRecipient,
                 config.prizeVaultYieldFeePercentage,
+                yieldBuffer,
                 msg.sender
             ));
             vm.stopPrank();
@@ -79,30 +91,38 @@ contract DeployPrizeVault is ScriptBase {
         vm.startBroadcast();
 
         // Deploy reward liquidator
-        AaveV3ERC4626Liquidator rewardLiquidator = config.aaveRewardLiquidatorFactory.createLiquidator(
+        RewardLiquidator rewardLiquidator = config.rewardLiquidatorFactory.createLiquidator(
             msg.sender,
             prizeVaultComputedAddress,
             IPrizePool(address(config.prizePool)),
             config.lpFactory,
-            config.aaveRewardLpTargetAuctionPeriod,
-            config.aaveRewardLpTargetAuctionPrice,
-            config.aaveRewardLpSmoothingFactor
+            config.rewardLpTargetAuctionPeriod,
+            config.rewardLpTargetAuctionPrice,
+            config.rewardLpSmoothingFactor
         );
 
-        // Deploy Aave yield vault
-        AaveV3ERC4626 yieldVault = new AaveV3ERC4626(
-            config.aaveV3Asset,
-            ERC20(aTokenAddress),
-            config.aaveV3Pool,
+        // Find mToken address
+        MToken[] memory mTokens = config.moonwellComptroller.getAllMarkets();
+        for (uint i = 0; i < mTokens.length; i++) {
+            if (MErc20(address(mTokens[i])).underlying() == address(config.moonwellVaultAsset)) {
+                mTokenAddress = address(mTokens[i]);
+            }
+        }
+        require(mTokenAddress != address(0), "Failed to find mToken for asset. Does the market exist?");
+
+        // Deploy Moonwell yield vault
+        CompoundERC4626 yieldVault = new CompoundERC4626(
+            config.moonwellVaultAsset,
+            MErc20(mTokenAddress),
             address(rewardLiquidator),
-            config.aaveV3RewardsController
+            config.moonwellComptroller
         );
         if (address(yieldVault) != config.yieldVaultComputedAddress) {
             revert("Yield vault address does not match the pre computed address!");
         }
 
         // Deploy prize vault
-        config.aaveV3Asset.approve(address(config.prizeVaultFactory), config.prizeVaultFactory.YIELD_BUFFER());
+        config.moonwellVaultAsset.approve(address(config.prizeVaultFactory), yieldBuffer);
         PrizeVault prizeVault = config.prizeVaultFactory.deployVault(
             config.prizeVaultName,
             config.prizeVaultSymbol,
@@ -111,6 +131,7 @@ contract DeployPrizeVault is ScriptBase {
             config.claimer,
             config.prizeVaultYieldFeeRecipient,
             config.prizeVaultYieldFeePercentage,
+            yieldBuffer,
             msg.sender
         );
         if (address(prizeVault) != prizeVaultComputedAddress) {
@@ -118,7 +139,7 @@ contract DeployPrizeVault is ScriptBase {
         }
 
         // Initialize reward liquidator
-        rewardLiquidator.setYieldVault(yieldVault);
+        rewardLiquidator.setYieldVault(IRewardSource(address(yieldVault)));
 
         // Deploy prize vault LP
         TpdaLiquidationPair lp = config.lpFactory.createPair(
@@ -156,7 +177,7 @@ contract DeployPrizeVault is ScriptBase {
                         prizeVault: prizeVault,
                         yieldVault: yieldVault,
                         rewardLiquidator: rewardLiquidator,
-                        aToken: ERC20(aTokenAddress),
+                        mToken: ERC20(mTokenAddress),
                         lpRouter: config.lpRouter
                     })
                 )
@@ -165,17 +186,10 @@ contract DeployPrizeVault is ScriptBase {
     }
 
     function preDeployChecks() internal virtual {
-        // Check if asset has an aToken
-        IPool.ReserveData memory reserveData = config.aaveV3Pool.getReserveData(address(config.aaveV3Asset));
-        aTokenAddress = reserveData.aTokenAddress;
-        if (aTokenAddress == address(0)) {
-            revert("No aToken found for underlying asset in the AaveV3 Pool.");
-        }
-
         // Check asset balance is enough for yield buffer
-        if (config.aaveV3Asset.balanceOf(msg.sender) < config.prizeVaultFactory.YIELD_BUFFER()) {
+        if (config.moonwellVaultAsset.balanceOf(msg.sender) < yieldBuffer) {
             console2.log("The deployer address must have a small amount of the deposit asset to donate to the prize vault.");
-            console2.log("Amount needed: ", config.prizeVaultFactory.YIELD_BUFFER());
+            console2.log("Amount needed: ", yieldBuffer);
             revert("Missing yield buffer asset balance...");
         }
     }

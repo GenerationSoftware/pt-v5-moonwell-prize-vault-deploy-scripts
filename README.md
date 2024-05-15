@@ -1,6 +1,6 @@
-# Aave V3 - Prize Vault Deployment Scripts
+# Moonwell - Prize Vault Deployment Scripts
 
-PoolTogether V5 production Aave V3 prize vault deployment scripts.
+PoolTogether V5 production Moonwell prize vault deployment scripts.
 
 ## Contents
 
@@ -49,7 +49,7 @@ yarn compile
 
 ## Configuration
 
-Each Aave V3 prize vault deployment share some configuration parameters across each chain, but have some unique params that must be set on deployment time such as the prize vault name, symbol, owner, and deposit asset.
+Each Moonwell prize vault deployment share some configuration parameters across each chain, but have some unique params that must be set on deployment time such as the prize vault name, symbol, owner, and deposit asset.
 
 All chain-specific configurable parameters are located in the [config](./config/) folder and are separated by chain name. If the target chain does not have it's own configuration file, then a new one can be created an modified based on the deployment requirements.
 
@@ -83,39 +83,34 @@ This is the liquidation smoothing factor for the ***prize vault*** liquidations.
 
 --------------------------------------------------------------------------------
 
-### `aaveRewardLiquidatorFactory`
+### `rewardLiquidatorFactory`
 
-This is the `AaveV3ERC4626LiquidatorFactory` contract that will be used to deploy a new reward liquidator for the new Aave yield vault.
+This is the `RewardLiquidatorFactory` contract that will be used to deploy a new reward liquidator for the new yield vault.
 
 --------------------------------------------------------------------------------
 
-### `aaveRewardLpTargetAuctionPeriod`
+### `rewardLpTargetAuctionPeriod`
 
 This is the target liquidation frequency for the ***reward liquidations***.
 
 --------------------------------------------------------------------------------
 
-### `aaveRewardLpTargetAuctionPrice`
+### `rewardLpTargetAuctionPrice`
 
 This is the starting target liquidation price for the ***reward liquidations***.
 
 --------------------------------------------------------------------------------
 
-### `aaveRewardLpSmoothingFactor`
+### `rewardLpSmoothingFactor`
 
 This is the smoothing factor for the ***reward liquidations***.
 
---------------------------------------------------------------------------------
-
-### `aaveV3Pool`
-
-This is the the Aave `IPool` contract that will be used to generate yield with the deposit asset.
 
 --------------------------------------------------------------------------------
 
-### `aaveV3RewardsController`
+### `moonwellComptroller`
 
-This is the Aave rewards controller that will be used to harvest rewards for the yield vault.
+This is the moonwell comptroller that will be used to harvest rewards for the yield vault.
 
 --------------------------------------------------------------------------------
 
@@ -137,9 +132,9 @@ This is the claimer contract that will be permitted to claim prizes for the priz
 
 --------------------------------------------------------------------------------
 
-### `aaveV3Asset`
+### `moonwellVaultAsset`
 
-This is the deposit asset that will be used to generate yield on Aave V3.
+This is the deposit asset that will be used to generate yield on Moonwell.
 
 --------------------------------------------------------------------------------
 
@@ -180,7 +175,7 @@ To deploy a new prize vault, first ensure the following steps have been complete
 1. set relevant environment variables (RPC URLs, deployer address and private key, etherscan API key)
 2. configure the chain-specific deployment parameters in a JSON file
 3. deploy a new reward liquidator factory (if one does not exist on the target chain)
-    1. Copy the `deploy:optimism:aaveRewardLiquidatorFactory` NPM script and modify it for your target chain before running the new script. Then set the reward liquidation factory param in the corresponding config JSON file.
+    1. Copy the `deploy:optimism:rewardLiquidatorFactory` NPM script and modify it for your target chain before running the new script. Then set the reward liquidation factory param in the corresponding config JSON file.
 4. Transfer at least 1e5 assets to the deployer address so they can be donated to the prize vault to fill the yield buffer on deployment. (Exactly 1e5 assets will be donated on deployment. These funds are not recoverable.)
 
 ### Deploy a New Prize Vault

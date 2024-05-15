@@ -2,9 +2,6 @@
 	path = lib/forge-std
 	url = https://github.com/foundry-rs/forge-std
 	branch = v1
-[submodule "lib/yield-daddy"]
-	path = lib/yield-daddy
-	url = https://github.com/timeless-fi/yield-daddy
 [submodule "lib/pt-v5-prize-pool"]
 	path = lib/pt-v5-prize-pool
 	url = https://github.com/generationsoftware/pt-v5-prize-pool
@@ -20,3 +17,6 @@
 [submodule "lib/pt-v5-twab-delegator"]
 	path = lib/pt-v5-twab-delegator
 	url = https://github.com/GenerationSoftware/pt-v5-twab-delegator
+[submodule "lib/moonwell-contracts-v2"]
+	path = lib/moonwell-contracts-v2
+	url = https://github.com/GenerationSoftware/moonwell-contracts-v2

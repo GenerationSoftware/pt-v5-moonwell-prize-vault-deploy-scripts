@@ -1,19 +1,18 @@
 {
-  "lpFactory": "0x34B40BA116d5Dec75548a9e9A8f15411461E8c70",
-  "prizeVaultLpTargetAuctionPeriod": "21600",
-  "prizeVaultLpTargetAuctionPrice": "100000000000000",
-  "prizeVaultLpSmoothingFactor": "500000000000000000",
+    "lpFactory": "0xb82008565fdc7e44609fa118a4a681e92581e680",
+    "prizeVaultLpTargetAuctionPeriod": "21600",
+    "prizeVaultLpTargetAuctionPrice": "100000000000000",
+    "prizeVaultLpSmoothingFactor": "500000000000000000",
 
-  "aaveRewardLiquidatorFactory": "0x3aAde2dCD2Df6a8cAc689EE797591b2913658659",
-  "aaveRewardLpTargetAuctionPeriod": "21600",
-  "aaveRewardLpTargetAuctionPrice": "100000000000000",
-  "aaveRewardLpSmoothingFactor": "500000000000000000",
+    "rewardLiquidatorFactory": "0x34B40BA116d5Dec75548a9e9A8f15411461E8c70",
+    "rewardLpTargetAuctionPeriod": "21600",
+    "rewardLpTargetAuctionPrice": "100000000000000",
+    "rewardLpSmoothingFactor": "500000000000000000",
 
-  "aaveV3Pool": "0x794a61358D6845594F94dc1DB02A252b5b4814aD",
-  "aaveV3RewardsController": "0x929EC64c34a17401F460460D4B9390518E5B473e",
+    "moonwellComptroller": "0xfBb21d0380beE3312B33c4353c8936a0F13EF26C",
 
-  "prizePool": "0x22753E4264FDDc6181dc7cce468904A80a363E44",
-  "prizeVaultFactory": "0x07882Ae1ecB7429a84f1D53048d35c4bB2056877",
-  "claimer": "0xCD85E41Cb6B116285914F35BcA1064AD3E1c769F",
-  "lpRouter": "0xD0141E899a65C95a556fE2B27e5982A6DE7fDD7A"
+    "prizePool": "0x8a93d247134d91e0de6f96547cb0204e5be8e5d8",
+    "prizeVaultFactory": "0xb9beecd1a582768711de1ee7b0a1d582d9d72a6c",
+    "claimer": "0xde1fb1be65a44c73761ebdabb10c4b101bc819c7",
+    "lpRouter": "0x2a810409872afc346f9b5b26571fd6ec42ea4849"
 }
