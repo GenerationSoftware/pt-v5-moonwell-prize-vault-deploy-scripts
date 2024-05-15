@@ -175,12 +175,12 @@ To deploy a new prize vault, first ensure the following steps have been complete
 1. set relevant environment variables (RPC URLs, deployer address and private key, etherscan API key)
 2. configure the chain-specific deployment parameters in a JSON file
 3. deploy a new reward liquidator factory (if one does not exist on the target chain)
-    1. Copy the `deploy:optimism:rewardLiquidatorFactory` NPM script and modify it for your target chain before running the new script. Then set the reward liquidation factory param in the corresponding config JSON file.
-4. Transfer at least 1e5 assets to the deployer address so they can be donated to the prize vault to fill the yield buffer on deployment. (Exactly 1e5 assets will be donated on deployment. These funds are not recoverable.)
+    1. Copy the `deploy:base:rewardLiquidatorFactory` NPM script and modify it for your target chain before running the new script. Then set the reward liquidation factory param in the corresponding config JSON file.
+4. Transfer a small amount of assets (about $1 worth) to the deployer address so they can be donated to the prize vault to fill the yield buffer on deployment.
 
 ### Deploy a New Prize Vault
 
-To deploy a new prize vault and supporting contracts, first follow the steps above and then run the NPM command in the `package.json` file that corresponds to the chain you wish to deploy on. For example, to deploy on optimism, run `npm run deploy:optimism:prizeVault`.
+To deploy a new prize vault and supporting contracts, first follow the steps above and then run the NPM command in the `package.json` file that corresponds to the chain you wish to deploy on. For example, to deploy on base, run `npm run deploy:base:prizeVault`.
 
 If a script is not setup for your target chain, first create a new config file for the chain and then copy one of the existing NPM commands and modify it to match your desired configuration.
 
