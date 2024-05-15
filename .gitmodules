@@ -20,3 +20,6 @@
 [submodule "lib/moonwell-contracts-v2"]
 	path = lib/moonwell-contracts-v2
 	url = https://github.com/GenerationSoftware/moonwell-contracts-v2
+[submodule "lib/pt-v5-vault-boost"]
+	path = lib/pt-v5-vault-boost
+	url = https://github.com/GenerationSoftware/pt-v5-vault-boost

@@ -7,6 +7,7 @@ pt-v5-liquidator-interfaces/=lib/pt-v5-tpda-liquidator/lib/pt-v5-liquidator-inte
 pt-v5-twab-controller/=lib/pt-v5-prize-pool/lib/pt-v5-twab-controller/src/
 pt-v5-vault/=lib/pt-v5-vault/src/
 pt-v5-yield-daddy-liquidators/=lib/pt-v5-yield-daddy-liquidators/src/
+pt-v5-vault-boost/=lib/pt-v5-vault-boost/src/
 yield-daddy/=lib/pt-v5-yield-daddy-liquidators/lib/yield-daddy/src/
 pt-v5-twab-delegator/=lib/pt-v5-twab-delegator/src/
 

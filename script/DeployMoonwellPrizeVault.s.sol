@@ -22,6 +22,7 @@ import {
 
 import { MToken } from "moonwell-contracts-v2/MToken.sol";
 
+import { VaultBoosterFactory, VaultBooster } from "pt-v5-vault-boost/VaultBoosterFactory.sol";
 import { TwabDelegator, IERC20 } from "pt-v5-twab-delegator/TwabDelegator.sol";
 
 struct PrizeVaultAddressBook {
@@ -37,6 +38,7 @@ string constant addressBookPath = "config/addressBook.txt";
 
 address constant wellAddress = address(0xA88594D404727625A9437C3f886C7643872296AE);
 address constant usdcAddress = address(0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913);
+VaultBoosterFactory constant vaultBoosterFactory = VaultBoosterFactory(address());
 
 contract DeployPrizeVault is ScriptBase {
 
@@ -174,6 +176,10 @@ contract DeployPrizeVault is ScriptBase {
         if (address(config.moonwellVaultAsset) == usdcAddress) {
             rewardLiquidator.initializeRewardToken(usdcAddress);
         }
+
+        // Deploy new vault booster for the prize vault
+        VaultBooster vaultBooster = vaultBoosterFactory.createVaultBooster(prizeVault.prizePool(), address(prizeVault), config.prizeVaultOwner);
+        console2.log("Deployed vault booster: ", address(vaultBooster));
 
         vm.stopBroadcast();
 
