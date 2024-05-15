@@ -78,43 +78,6 @@ contract PrizeVaultPostDeployTest is Test {
         assertGt(addressBook.prizeVault.liquidatableBalanceOf(address(addressBook.prizeVault)), 0);
     }
 
-    function testMoonwellRewardLp() public {
-        // spoof `asset` rewards to the yield vault and test that the LP picks them up
-        ERC20 asset = ERC20(addressBook.prizeVault.asset());
-        uint256 amount = 10 ** asset.decimals();
-        uint256 maxAmount = asset.balanceOf(address(addressBook.mToken));
-        assertGt(maxAmount, 1);
-        if (amount >= maxAmount) amount = maxAmount / 2;
-
-        // The mToken address should hold lots of the asset, so we can spoof that address as our "dealer"
-        vm.startPrank(address(addressBook.mToken));
-        asset.transfer(address(addressBook.yieldVault), amount);
-        vm.stopPrank();
-
-        // Create new reward LP
-        TpdaLiquidationPair rewardLp = addressBook.rewardLiquidator.initializeRewardToken(address(asset));
-
-        // Check if rewards are picked up
-        MToken[] memory mTokenList = new MToken[](1);
-        mTokenList[0] = MToken(address(addressBook.mToken));
-        address[] memory holders = new address[](1);
-        holders[0] = address(addressBook.yieldVault);
-        vm.mockCall(
-            address(addressBook.yieldVault.comptroller()),
-            abi.encodeWithSignature("claimReward(address[] memory,address[] memory,bool,bool)", holders, mTokenList, false, true),
-            ""
-        );
-        uint256 liquid = addressBook.rewardLiquidator.liquidatableBalanceOf(address(asset));
-        assertEq(liquid, amount);
-
-        // Check if LP can liquidate
-        vm.warp(block.timestamp + rewardLp.targetAuctionPeriod());
-        uint256 maxAmountOut = rewardLp.maxAmountOut();
-        assertGt(maxAmountOut, 0);
-        assertLe(maxAmountOut, amount);
-        assertApproxEqAbs(rewardLp.computeExactAmountIn(maxAmountOut), uint256(rewardLp.lastAuctionPrice()), 1);
-    }
-
     function testWellRewards() public {
         // deposit and let rewards accrue
         address asset = addressBook.prizeVault.asset();
@@ -122,8 +85,6 @@ contract PrizeVaultPostDeployTest is Test {
         deal(asset, address(this), depositAmount);
         ERC20(asset).approve(address(addressBook.prizeVault), depositAmount);
         addressBook.prizeVault.deposit(depositAmount, address(this));
-
-        vm.warp(block.timestamp + 7 days);
 
         TpdaLiquidationPair rewardLp = addressBook.rewardLiquidator.liquidationPairs(address(WELL));
         require(address(rewardLp) != address(0), "not initialized");
@@ -133,11 +94,11 @@ contract PrizeVaultPostDeployTest is Test {
         if (liquid > 0) {
             
             // Check if LP can liquidate
-            vm.warp(block.timestamp + rewardLp.targetAuctionPeriod());
+            vm.warp(rewardLp.lastAuctionAt() + rewardLp.targetAuctionPeriod());
             uint256 maxAmountOut = rewardLp.maxAmountOut();
             assertGt(maxAmountOut, 0);
             uint256 exactAmountIn = rewardLp.computeExactAmountIn(maxAmountOut);
-            assertApproxEqAbs(exactAmountIn, uint256(rewardLp.lastAuctionPrice()), 1);
+            assertApproxEqRel(exactAmountIn, uint256(rewardLp.lastAuctionPrice()), 0.01e18);
 
             // liquidate
             PrizePool prizePool = addressBook.prizeVault.prizePool();

@@ -38,7 +38,7 @@ string constant addressBookPath = "config/addressBook.txt";
 
 address constant wellAddress = address(0xA88594D404727625A9437C3f886C7643872296AE);
 address constant usdcAddress = address(0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913);
-VaultBoosterFactory constant vaultBoosterFactory = VaultBoosterFactory(address());
+VaultBoosterFactory constant vaultBoosterFactory = VaultBoosterFactory(address(0x02D37f2654B4161801c8d7369b43A8762a31530e));
 
 contract DeployPrizeVault is ScriptBase {
 

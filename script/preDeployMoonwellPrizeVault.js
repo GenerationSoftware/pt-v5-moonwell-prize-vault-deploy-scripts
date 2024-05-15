@@ -6,14 +6,10 @@ const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 const main = async () => {
 
+    const asciiHeader = await fs.readFile("./config/ascii.txt", "utf8");
+
     // Display Script Header:
-    console.log("  ___                    _   _  _____                                                    ");
-    console.log(" / _ \\                  | | | ||____ |                                                   ");
-    console.log("/ /_\\ \\ __ ___   _____  | | | |    / /                                                   ");
-    console.log("|  _  |/ _` \\ \\ / / _ \\ | | | |    \\ \\                                                   ");
-    console.log("| | | | (_| |\\ V /  __/ \\ \\_/ /.___/ /                                                   ");
-    console.log("\\_| |_/\\__,_| \\_/ \\___|  \\___/ \\____/                                                    ");
-    console.log("");
+    console.log(asciiHeader);
     console.log("______     _           _   _             _ _    ______           _                       ");
     console.log("| ___ \\   (_)         | | | |           | | |   |  _  \\         | |                      ");
     console.log("| |_/ / __ _ _______  | | | | __ _ _   _| | |_  | | | |___ _ __ | | ___  _   _  ___ _ __ ");
