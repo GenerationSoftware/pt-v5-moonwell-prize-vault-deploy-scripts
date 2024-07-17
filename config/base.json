@@ -12,7 +12,7 @@
     "moonwellComptroller": "0xfBb21d0380beE3312B33c4353c8936a0F13EF26C",
 
     "prizePool": "0x45b2010d8a4f08b53c9fa7544c51dfd9733732cb",
-    "prizeVaultFactory": "0xe32f6344875494ca3643198d87524519dc396ddf",
-    "claimer": "0x5ffeee76d1e2d2d1d18ba0bc77d8d047b85e1e87",
+    "prizeVaultFactory": "0xa55a74A457D8a24D68DdA0b5d1E0341746d444Bf",
+    "claimer": "0xcdCE635b774DE77cdF791647601dba64a75547ba",
     "lpRouter": "0xa9c937a0d1d22ad79099aea10efa62a270dfc22c"
 }
