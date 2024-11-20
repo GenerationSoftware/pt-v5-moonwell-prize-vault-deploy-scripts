@@ -185,3 +185,5 @@ To deploy a new prize vault and supporting contracts, first follow the steps abo
 If a script is not setup for your target chain, first create a new config file for the chain and then copy one of the existing NPM commands and modify it to match your desired configuration.
 
 After deployment, contracts will automatically be verified on etherscan using your set etherscan API key for the relevant chain.
+
+If there are additional token rewards on the yield vault used, they can be initialized after deployment by calling `initializeRewardToken` on the `RewardLiquidator` paired with the deployed yield vault.

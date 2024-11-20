@@ -164,12 +164,12 @@ contract DeployPrizeVault is ScriptBase {
         }
 
         // Deploy Twab Delegator for the prize vault
-        new TwabDelegator(
-            string.concat("Staked ", prizeVault.name()),
-            string.concat("st", prizeVault.symbol()),
-            prizeVault.twabController(),
-            IERC20(address(prizeVault))
-        );
+        // new TwabDelegator(
+        //     string.concat("Staked ", prizeVault.name()),
+        //     string.concat("st", prizeVault.symbol()),
+        //     prizeVault.twabController(),
+        //     IERC20(address(prizeVault))
+        // );
 
         // Initialize active rewards
         rewardLiquidator.initializeRewardToken(wellAddress);
@@ -178,8 +178,8 @@ contract DeployPrizeVault is ScriptBase {
         }
 
         // Deploy new vault booster for the prize vault
-        VaultBooster vaultBooster = vaultBoosterFactory.createVaultBooster(prizeVault.prizePool(), address(prizeVault), config.prizeVaultOwner);
-        console2.log("Deployed vault booster: ", address(vaultBooster));
+        // VaultBooster vaultBooster = vaultBoosterFactory.createVaultBooster(prizeVault.prizePool(), address(prizeVault), config.prizeVaultOwner);
+        // console2.log("Deployed vault booster: ", address(vaultBooster));
 
         vm.stopBroadcast();
 

@@ -13,6 +13,7 @@ contract PrizeVaultPostDeployTest is Test {
     uint256 deployFork;
     PrizeVaultAddressBook addressBook;
     address WELL = address(0xA88594D404727625A9437C3f886C7643872296AE);
+    uint256 precisionLoss = 1; // default 1
 
     constructor() {
         deployFork = vm.createFork(vm.envString("SCRIPT_RPC_URL"));
@@ -28,6 +29,10 @@ contract PrizeVaultPostDeployTest is Test {
     
     function setUp() public {
         vm.selectFork(deployFork);
+        uint8 decimals = addressBook.prizeVault.decimals();
+        if (decimals > 9) {
+            precisionLoss = (10 ** (decimals - 9)); // addition precision loss on assets with more than 9 decimals
+        }
     }
 
     function testAddressBook() public view {
@@ -63,7 +68,7 @@ contract PrizeVaultPostDeployTest is Test {
 
         // Let yield accrue over time
         uint256 totalAssetsBefore = addressBook.prizeVault.totalAssets();
-        assertApproxEqAbs(totalAssetsBefore, amount + addressBook.prizeVault.yieldBuffer(), 1);
+        assertApproxEqAbs(totalAssetsBefore, amount + addressBook.prizeVault.yieldBuffer(), precisionLoss);
         vm.warp(block.timestamp + 10 days);
         uint256 totalAssetsAfter = addressBook.prizeVault.totalAssets();
         assertGt(totalAssetsAfter, totalAssetsBefore);

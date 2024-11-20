@@ -1,0 +1,18 @@
+{
+    "lpFactory": "0x80F86691632d9863E6bCaa472e5c34574F77c7D1",
+    "prizeVaultLpTargetAuctionPeriod": "86400",
+    "prizeVaultLpTargetAuctionPrice": "100000000000000",
+    "prizeVaultLpSmoothingFactor": "500000000000000000",
+
+    "rewardLiquidatorFactory": "0x7f75B9c7F04b02302943b0f08b02eaF2e13d5370",
+    "rewardLpTargetAuctionPeriod": "86400",
+    "rewardLpTargetAuctionPrice": "100000000000000",
+    "rewardLpSmoothingFactor": "500000000000000000",
+
+    "moonwellComptroller": "0xCa889f40aae37FFf165BccF69aeF1E82b5C511B9",
+
+    "prizePool": "0xF35fE10ffd0a9672d0095c435fd8767A7fe29B55",
+    "prizeVaultFactory": "0xec9f59bD06465b105e719c0b0483A4Ed6A656775",
+    "claimer": "0x220C9398b0Ee07472bF8906e44574Cb9FE3B8D90",
+    "lpRouter": "0x7766b5E6839a1a218Fc861b0810C504490876136"
+}
