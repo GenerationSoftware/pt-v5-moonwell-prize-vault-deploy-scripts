@@ -54,12 +54,16 @@ contract PrizeVaultPostDeployTest is Test {
         assertGt(maxAmount, 1);
         if (amount >= maxAmount) amount = maxAmount / 2;
 
+        uint256 balanceBefore = asset.balanceOf(address(this));
+
         // The mToken address should hold lots of the asset, so we can spoof that address as our "dealer"
         vm.startPrank(address(addressBook.mToken));
         asset.transfer(address(this), amount);
         vm.stopPrank();
 
-        assertEq(asset.balanceOf(address(this)), amount);
+        // Check if our address has been funded correctly
+        uint256 balanceAfter = asset.balanceOf(address(this));
+        assertEq(balanceAfter, balanceBefore + amount);
 
         // Test deposit and withdraw
         asset.approve(address(addressBook.prizeVault), amount);
